@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import autopopulate from 'mongoose-autopopulate';
 
 const bookSchema = new mongoose.Schema(
     {
@@ -18,7 +19,8 @@ const bookSchema = new mongoose.Schema(
             required: [
                 true,
                 'author field is required'
-            ]
+            ],
+            autopopulate: true
         },
         publisher: {
             type: String,
@@ -46,6 +48,7 @@ const bookSchema = new mongoose.Schema(
     }
 );
 
+bookSchema.plugin(autopopulate);
 const books = mongoose.model('books', bookSchema);
 
 export default books;

@@ -20,8 +20,29 @@ class BookController {
 
     static listBooks = async (req, res, next) => {
         try {
-            const allBooks = await books.find().populate('author').exec();
-            res.status(200).json(allBooks);
+            const booksResult = books.find();
+
+            req.result = booksResult;
+            next();
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    static listBookByFilter = async (req, res, next) => {
+        try {
+            const filter = await filterSearch(req.query);
+
+            if (filter !== null) {
+                const booksResult = books
+                    .find(filter)
+                    .exec();
+                
+                req.result = booksResult;
+                next();
+            } else {
+                res.status(200).json([]);
+            }
         } catch (error) {
             next(error);
         }
@@ -30,7 +51,7 @@ class BookController {
     static listBookById = async (req, res, next) => {
         try {
             const { id } = req.params;
-            const book = await books.findById(id).populate('author').exec();
+            const book = await books.findById(id).exec();
 
             if (book !== null) {
                 res.status(200).json(book);
@@ -72,21 +93,6 @@ class BookController {
                 });
             } else {
                 next(new ErrorNotFound('Book not found.'));
-            }
-        } catch (error) {
-            next(error);
-        }
-    };
-
-    static listBookByFilter = async (req, res, next) => {
-        try {
-            const filter = await filterSearch(req.query);
-
-            if (filter !== null) {
-                const bookList = await books.find(filter).populate('author').exec();
-                res.status(200).json(bookList);
-            } else {
-                res.status(200).json([]);
             }
         } catch (error) {
             next(error);
